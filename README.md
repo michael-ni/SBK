@@ -7,16 +7,20 @@ You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
 -->
-# Storage Benchmark Kit (SBK) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)  [![Api](https://img.shields.io/badge/SBK-API-brightgreen)](https://kmgowda.github.io/SBK/javadoc/index.html) [![Version](https://img.shields.io/badge/release-0.7-blue)](https://github.com/kmgowda/SBK/releases/tag/0.7)
+# Storage Benchmark Kit (SBK) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)  [![Api](https://img.shields.io/badge/SBK-API-brightgreen)](https://kmgowda.github.io/SBK/javadoc/index.html) [![Version](https://img.shields.io/badge/release-0.71-blue)](https://github.com/kmgowda/SBK/releases/tag/0.71)
 
 The SBK (Storage Benchmark Kit) is an open source software frame-work for the performance benchmarking of any storage system. If you are curious to measure the  maximum throughput performance of your storage device/system, then SBK is the right software for you. The SBK itself a very high-performance benchmark  tool/frame work. It massively writes the data to storage system and reads the data from strorage system. The SBK supports multi writers and readers and also the End to End latency benchmarking. The percentiles are calculated for complete data written/read without any sampling; hence the percentiles are 100% accurate.
 
 Currently SBK supports benchmarking of
-1. [Apache Kafka](https://kafka.apache.org)
-2. [Apache Pulsar](https://pulsar.apache.org)
-3. [Pravega](http://pravega.io) distributed streaming storage systems
-4. Local mounted File Systems
-5. [Java Concurrent Queue [Message Queue]](https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ConcurrentLinkedQueue.html).
+1. Local mounted File Systems
+2. [Java Concurrent Queue [Message Queue]](https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ConcurrentLinkedQueue.html)
+3. [Apache Kafka](https://kafka.apache.org)
+4. [Apache Pulsar](https://pulsar.apache.org)
+5. [Pravega](http://pravega.io)
+6. [HDFS](https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/HdfsDesign.html)
+7. [Apache Bookkeeper](https://bookkeeper.apache.org)
+8. [RabbitMQ](https://www.rabbitmq.com)
+9. [RocketMQ](https://rocketmq.apache.org)
 
 In future, many more storage storage systems drivers will be plugged in. 
 
@@ -108,7 +112,7 @@ Writing(Total)    2137248 records,   38387.2 records/sec,    36.61 MB/sec,     2
 ```
 
 ### Grafana Dashboards of SBK
-When you run the SBK, by default it starts the http server and all the output benchmark data are directed to the default port number: **8080** and **metrics** context.  if you want to change the port number and context, you can use the command line argument **-context** to change the same.  you have to run the prometheus monitoring system (server [default port number is 9090] cum client) which pulls/fetches the benchmark data from the local/remote http server. In case, if you are fetching metrics/benchmark data from remote http server , or from port number other than 8080 or from the context other than **metrics** then you need to change the [default prometheus server configuration](https://github.com/kmgowda/SBK/blob/master/config/metrics/prometheus/sample-config/sbk-prometheus-sample-config.yml) too. Run the grafana server (cum client) to fetch the benchmark data from  prometheus, For example, if you are running local grafana server then by default it  fetchs the data from prometheus server at the local port 9090. you can access the local grafana server at localhost:3000 in your browser using **admin/admin** as default user name / password. The example dashboards to fetch the SBK benchmark data of Kafka, Pravega, Pulsar , local file system and Concurrent Queues from local prometheus are below. you can import below configuration directly if you are running prometheus locally.
+When you run the SBK, by default it starts the http server and all the output benchmark data are directed to the default port number: **8080** and **metrics** context.  if you want to change the port number and context, you can use the command line argument **-context** to change the same.  you have to run the prometheus monitoring system (server [default port number is 9090] cum client) which pulls/fetches the benchmark data from the local/remote http server. In case, if you are fetching metrics/benchmark data from remote http server , or from port number other than 8080 or from the context other than **metrics** then you need to change the [default prometheus server configuration](https://github.com/kmgowda/SBK/blob/master/config/metrics/prometheus/sample-config/sbk-prometheus-sample-config.yml) too. Run the grafana server (cum client) to fetch the benchmark data from  prometheus, For example, if you are running local grafana server then by default it  fetchs the data from prometheus server at the local port 9090. you can access the local grafana server at localhost:3000 in your browser using **admin/admin** as default user name / password. The few example dashboards to fetch the SBK benchmark data of Kafka, Pravega, Pulsar , local file system and Concurrent Queues from local prometheus are below. 
 
 1. [Kafka dashboard config](https://github.com/kmgowda/SBK/blob/master/config/metrics/grafana/sample-dashboards/SBK-Kafka-Benchmark.json)
 2. [Pulsar dashboard config](https://github.com/kmgowda/SBK/blob/master/config/metrics/grafana/sample-dashboards/SBK-Pulsar-Benchmark.json)
@@ -309,7 +313,7 @@ For eclipse, you can generate eclipse project files by running `./gradlew eclips
         
       c). Close the Writer: [[close](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Writer.html#close--)]
         
-      d). In case , if you want to have your own recordWrite implemenation to write data and record the start and end time, then you can override: [[recordWrite](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Writer.html#recordWrite-byte:A-io.sbk.api.QuadConsumer-)]
+      d). In case , if you want to have your own recordWrite implemenation to write data and record the start and end time, then you can override: [[recordWrite](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Writer.html#recordWrite-byte:A-io.sbk.api.RecordTime-)]
 
 
 5. Implement the Reader Interface: [[Reader](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Reader.html)]
@@ -412,7 +416,7 @@ As expalined in [Adding your Storage driver](https://github.com/kmgowda/SBK#add-
 
 
 #### SBK preformance Processor
-The key differentiator component of SBK to get the max throughput of the storage driver is **SBK performance Processor**. The SBK is a spin-off from pravega benchmark tool, refer to the paper : [[Distributed Streaming Storage Performance Benchmarking: Kafka and Pravega](https://www.researchgate.net/publication/338171860_Distributed_Streaming_Storage_Performance_Benchmarking_Kafka_and_Pravega)] to know the internal design details of **SBK performance Processor** , data type handlers and about writer/readers too. This paper also compares the performance of Kafka and Pravega streaming storage Systems.
+The key differentiator component of SBK to get the max throughput of the storage driver is **SBK performance Processor**. This component uses the multiple concurrent queues to aggregate the benchmark results to reduce the sync issues between the response threads from writers/readers.
     
 
 #### Result logger, SL4J, System Logger and Prometheus Logger
