@@ -7,7 +7,8 @@ You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
 -->
-# Storage Benchmark Kit (SBK) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)  [![Api](https://img.shields.io/badge/SBK-API-brightgreen)](https://kmgowda.github.io/SBK/javadoc/index.html) [![Version](https://img.shields.io/badge/release-0.71-blue)](https://github.com/kmgowda/SBK/releases/tag/0.71)
+# Storage Benchmark Kit  ![SBK](https://github.com/kmgowda/SBK/blob/gh-pages/images/SBK-log-small-1.png)
+[![Build Status](https://travis-ci.org/kmgowda/SBK.svg?branch=master)](https://travis-ci.org/kmgowda/SBK) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)  [![Api](https://img.shields.io/badge/SBK-API-brightgreen)](https://kmgowda.github.io/SBK/javadoc/index.html) [![Version](https://img.shields.io/badge/release-0.74-blue)](https://github.com/kmgowda/SBK/releases/tag/0.74)
 
 The SBK (Storage Benchmark Kit) is an open source software frame-work for the performance benchmarking of any storage system. If you are curious to measure the  maximum throughput performance of your storage device/system, then SBK is the right software for you. The SBK itself a very high-performance benchmark  tool/frame work. It massively writes the data to storage system and reads the data from strorage system. The SBK supports multi writers and readers and also the End to End latency benchmarking. The percentiles are calculated for complete data written/read without any sampling; hence the percentiles are 100% accurate.
 
@@ -21,6 +22,9 @@ Currently SBK supports benchmarking of
 7. [Apache Bookkeeper](https://bookkeeper.apache.org)
 8. [RabbitMQ](https://www.rabbitmq.com)
 9. [RocketMQ](https://rocketmq.apache.org)
+10. [ActiveMQ Artemis](https://activemq.apache.org/components/artemis)
+11. [NATS Distributed Messaging](https://nats.io)
+12. [NATS Streaming Storage](https://nats.io/blog/introducing-nats-streaming)
 
 In future, many more storage storage systems drivers will be plugged in. 
 
@@ -59,16 +63,16 @@ tar -xvf ./build/distributions/sbk.tar -C ./build/distributions/.
 Running SBK locally:
 
 ```
-<SBK directory>$ ./build/distributions/sbk/bin/sbk  -help
+<SBK directory>/./build/distributions/sbk/bin/sbk -help
 usage: sbk
- -class <arg>        Benchmark Driver Class,
-                     Available Drivers [ConcurrentQ, File, Kafka, Pravega,
-                     Pulsar]
+ -class <arg>        Storage Driver Class,
+                     Available Drivers [Artemis, AsyncFile, BookKeeper,
+                     ConcurrentQ, File, HDFS, Kafka, Nats, NatsStream,
+                     Nsq, Pravega, Pulsar, RabbitMQ, RocketMQ]
  -context <arg>      Prometheus Metric context;default context:
                      8080/metrics; 'no' disables the  metrics
  -flush <arg>        Each Writer calls flush after writing <arg> number of
-                     of events(records); Not applicable, if both writers
-                     and readers are specified
+                     of events(records)
  -help               Help message
  -readers <arg>      Number of readers
  -records <arg>      Number of records(events) if 'time' not specified;
@@ -79,7 +83,6 @@ usage: sbk
                      if 0 , writes 'records'
                      if -1, get the maximum throughput
  -time <arg>         Number of seconds this SBK runs (24hrs by default)
- -version            Version
  -writers <arg>      Number of writers
 ```
 
@@ -88,27 +91,26 @@ The SBK  can be executed to
  - write/read specific amount of events/records to/from the storage driver (device/cluster)
  - write/read the events/records for the specified amount of time
  
-SBK outputs the data written/read , average throughput and latency , maximum latency  and the latency percentiles 50th, 75th, 95th, 99th , 99.9th and 99.99th for every 5 seconds time interval as show below.
+SBK outputs the data written/read , average throughput and latency , maximum latency  and the latency percentiles 10th, 25th, 50th, 75th, 95th, 99th , 99.9th and 99.99th for every 5 seconds time interval as show below.
 
 ```
-Writing     234059 records,   46774.4 records/sec,    44.61 MB/sec,     19.8 ms avg latency,     151 ms max latency,       0 discarded latencies; Percentiles:      15 ms 50th,      19 ms 75th,      71 ms 95th,      87 ms 99th,     120 ms 99.9th,     121 ms 99.99th.
-Writing     241211 records,   48203.6 records/sec,    45.97 MB/sec,     19.9 ms avg latency,     326 ms max latency,       0 discarded latencies; Percentiles:      14 ms 50th,      18 ms 75th,      69 ms 95th,     129 ms 99th,     324 ms 99.9th,     325 ms 99.99th.
-Writing     181333 records,   36259.3 records/sec,    34.58 MB/sec,     26.6 ms avg latency,     472 ms max latency,       0 discarded latencies; Percentiles:      15 ms 50th,      20 ms 75th,      75 ms 95th,     292 ms 99th,     470 ms 99.9th,     471 ms 99.99th.
-Writing     207749 records,   41541.5 records/sec,    39.62 MB/sec,     23.3 ms avg latency,     474 ms max latency,       0 discarded latencies; Percentiles:      14 ms 50th,      17 ms 75th,      74 ms 95th,     259 ms 99th,     467 ms 99.9th,     468 ms 99.99th.
-Writing     278237 records,   54933.3 records/sec,    52.39 MB/sec,     17.1 ms avg latency,     127 ms max latency,       0 discarded latencies; Percentiles:      13 ms 50th,      16 ms 75th,      67 ms 95th,      94 ms 99th,     108 ms 99.9th,     113 ms 99.99th.
-Writing     188978 records,   37421.4 records/sec,    35.69 MB/sec,     26.0 ms avg latency,     540 ms max latency,       0 discarded latencies; Percentiles:      14 ms 50th,      17 ms 75th,      70 ms 95th,     279 ms 99th,     539 ms 99.9th,     539 ms 99.99th.
-Writing     241126 records,   48186.7 records/sec,    45.95 MB/sec,     20.3 ms avg latency,     155 ms max latency,       0 discarded latencies; Percentiles:      13 ms 50th,      17 ms 75th,      73 ms 95th,     116 ms 99th,     153 ms 99.9th,     154 ms 99.99th.
-Writing     217897 records,   43345.3 records/sec,    41.34 MB/sec,     22.1 ms avg latency,     224 ms max latency,       0 discarded latencies; Percentiles:      14 ms 50th,      16 ms 75th,      77 ms 95th,     184 ms 99th,     220 ms 99.9th,     221 ms 99.99th.
-Writing      76501 records,   14748.6 records/sec,    14.07 MB/sec,     63.7 ms avg latency,     720 ms max latency,       0 discarded latencies; Percentiles:      17 ms 50th,      74 ms 75th,     260 ms 95th,     620 ms 99th,     715 ms 99.9th,     716 ms 99.99th.
-Writing     158371 records,   31642.6 records/sec,    30.18 MB/sec,     32.6 ms avg latency,     957 ms max latency,       0 discarded latencies; Percentiles:      14 ms 50th,      18 ms 75th,      92 ms 95th,     370 ms 99th,     955 ms 99.9th,     955 ms 99.99th.
-Writing     111786 records,   20980.9 records/sec,    20.01 MB/sec,     37.3 ms avg latency,    1018 ms max latency,       0 discarded latencies; Percentiles:      16 ms 50th,      25 ms 75th,     116 ms 95th,     162 ms 99th,    1018 ms 99.9th,    1018 ms 99.99th.
+Writing     131673 records,   26032.6 records/sec,    24.83 MB/sec,     35.2 ms avg latency,     674 ms max latency; Discarded Latencies:       0 lower,        0 higher;  Latency Percentiles:      13 ms 10th,      16 ms 25th,      21 ms 50th,      26 ms 75th,     135 ms 95th,     351 ms 99th,     670 ms 99.9th,     671 ms 99.99th.
+Writing     154995 records,   30480.8 records/sec,    29.07 MB/sec,     32.2 ms avg latency,     255 ms max latency; Discarded Latencies:       0 lower,        0 higher;  Latency Percentiles:      13 ms 10th,      16 ms 25th,      20 ms 50th,      26 ms 75th,     114 ms 95th,     165 ms 99th,     251 ms 99.9th,     252 ms 99.99th.
+Writing     150029 records,   28387.7 records/sec,    27.07 MB/sec,     32.8 ms avg latency,     384 ms max latency; Discarded Latencies:       0 lower,        0 higher;  Latency Percentiles:      13 ms 10th,      17 ms 25th,      21 ms 50th,      29 ms 75th,     111 ms 95th,     188 ms 99th,     205 ms 99.9th,     206 ms 99.99th.
+Writing       9352 records,    1484.7 records/sec,     1.42 MB/sec,    378.4 ms avg latency,     669 ms max latency; Discarded Latencies:       0 lower,        0 higher;  Latency Percentiles:     199 ms 10th,     251 ms 25th,     384 ms 50th,     457 ms 75th,     623 ms 95th,     662 ms 99th,     669 ms 99.9th,     669 ms 99.99th.
+Writing      50539 records,    9621.0 records/sec,     9.18 MB/sec,    155.3 ms avg latency,    3558 ms max latency; Discarded Latencies:       0 lower,        0 higher;  Latency Percentiles:      11 ms 10th,      14 ms 25th,      19 ms 50th,      89 ms 75th,     397 ms 95th,    3268 ms 99th,    3558 ms 99.9th,    3558 ms 99.99th.
+Writing     158236 records,   31640.9 records/sec,    30.18 MB/sec,     34.1 ms avg latency,     639 ms max latency; Discarded Latencies:       0 lower,        0 higher;  Latency Percentiles:      13 ms 10th,      16 ms 25th,      20 ms 50th,      26 ms 75th,     104 ms 95th,     518 ms 99th,     637 ms 99.9th,     637 ms 99.99th.
+Writing     159087 records,   31785.6 records/sec,    30.31 MB/sec,     30.9 ms avg latency,     457 ms max latency; Discarded Latencies:       0 lower,        0 higher;  Latency Percentiles:      10 ms 10th,      13 ms 25th,      16 ms 50th,      22 ms 75th,     108 ms 95th,     301 ms 99th,     456 ms 99.9th,     456 ms 99.99th.
+Writing     146443 records,   22265.9 records/sec,    21.23 MB/sec,     30.7 ms avg latency,    2035 ms max latency; Discarded Latencies:       0 lower,        0 higher;  Latency Percentiles:      12 ms 10th,      14 ms 25th,      18 ms 50th,      26 ms 75th,     108 ms 95th,     165 ms 99th,     184 ms 99.9th,     201 ms 99.99th.
+Writing      14746 records,    2778.6 records/sec,     2.65 MB/sec,    462.4 ms avg latency,    2072 ms max latency; Discarded Latencies:       0 lower,        0 higher;  Latency Percentiles:     129 ms 10th,     181 ms 25th,     376 ms 50th,     515 ms 75th,    2021 ms 95th,    2035 ms 99th,    2036 ms 99.9th,    2036 ms 99.99th.
+Writing      46208 records,    9236.1 records/sec,     8.81 MB/sec,    118.6 ms avg latency,    2167 ms max latency; Discarded Latencies:       0 lower,        0 higher;  Latency Percentiles:      11 ms 10th,      15 ms 25th,      26 ms 50th,     113 ms 75th,     438 ms 95th,    1739 ms 99th,    2167 ms 99.9th,    2167 ms 99.99th.
 ```
 
-At the end of the benchmarking session, SBK outputs the total data written/read , average throughput and latency , maximum latency  and the latency percentiles 50th, 75th, 95th, 99th , 99.9th and 99.99th for the complete data records written/read.
+At the end of the benchmarking session, SBK outputs the total data written/read , average throughput and latency , maximum latency  and the latency percentiles 10th, 25th, 50th, 75th, 95th, 99th , 99.9th and 99.99th for the complete data records written/read.
 An example  final output is show as below:
 
 ```
-Writing(Total)    2137248 records,   38387.2 records/sec,    36.61 MB/sec,     24.6 ms avg latency,    1018 ms max latency,       0 discarded latencies; Percentiles:      14 ms 50th,      18 ms 75th,      78 ms 95th,     231 ms 99th,     623 ms 99.9th,     955 ms 99.99th.
+Writing(Total)    1116193 records,   19795.9 records/sec,    18.88 MB/sec,     49.7 ms avg latency,    3558 ms max latency; Discarded Latencies:       0 lower,        0 higher;  Latency Percentiles:      12 ms 10th,      15 ms 25th,      20 ms 50th,      27 ms 75th,     163 ms 95th,     538 ms 99th,    2167 ms 99.9th,    3557 ms 99.99th.
 ```
 
 ### Grafana Dashboards of SBK
@@ -127,6 +129,25 @@ The sample output of Standalone Pulsar benchmark data with grafana is below
 #### Port conflicts between strage servers and grafana/prometheus
 * If you have running Pulsar server in standalone/local mode or if you are running SBK in the same system in which Pulsar broker is also running, then using the local port 8080 conflicts with the Pulsar Admin which runs at same port. So, either you change the Pulsar admin port or change the SBK's http port usig **-metrics** option.
 * If you are running Pravega server in standalone/local mode or if you are running SBK in the same system in which Pravega controller is also running, then Prometheus port 9090 conflicts with the Pravega controller. So, either you change the Pravega controller port number or change the Prometheus port number in the [prometheus configuraiton file](https://github.com/kmgowda/SBK/blob/master/config/metrics/prometheus/sample-config/sbk-prometheus-sample-config.yml) before deploying the prometheus. 
+
+
+## SBK Docker Containers
+The SBK Docker images are avilable at [SBK Docker](https://hub.docker.com/r/kmgowda/sbk)
+
+The SBK docker image pull command is 
+```
+docker pull kmgowda/sbk
+```
+
+you can strightaway run the docker image too, For example
+```
+docker run  -p 127.0.0.1:8080:8080/tcp  kmgowda/sbk:latest -class  rabbitmq  -broker 192.168.0.192 -topic kmg-topic-11  -writers 5  -readers 1 -size 100 -time 60
+```
+* Note that the option **-p 127.0.0.1:8080:8080/tcp** redirects the 8080 port to local port for fetch the performance metric data for Prometheus.  
+* Avoid using the **--network host** option , because this option overrides the port redirection.
+
+#### [SBK Kubernetes Deployments samples](https://github.com/kmgowda/SBK/tree/master/config/kubernetes) 
+
 
 ## SBK Execution Modes
 
@@ -275,28 +296,28 @@ For eclipse, you can generate eclipse project files by running `./gradlew eclips
     * See the Example: [[Pulsar driver package](https://github.com/kmgowda/sbk/tree/master/driver-pulsar/src/main/java/io/sbk/Pulsar)]   
     
 
-3. In your driver package you have to implement the Interface: [[Benchmark](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Benchmark.html)]
+3. In your driver package you have to implement the Interface: [[Storage](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Storage.html)]
 
     * See the Example:  [[Pulsar class](https://github.com/kmgowda/sbk/blob/master/driver-pulsar/src/main/java/io/sbk/Pulsar/Pulsar.java)]
     
     * you have to implement the following methods of Benchmark Interface:
         
-      a). Add the Addtional parameters (Command line Parameters) for your driver :[[addArgs](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Benchmark.html#addArgs-io.sbk.api.Parameters-)]
+      a). Add the Addtional parameters (Command line Parameters) for your driver :[[addArgs](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Storage.html#addArgs-io.sbk.api.Parameters-)]
       * The default command line parameters are listed in the help output here : [[Building SBK](https://github.com/kmgowda/sbk#building)]
         
-      b). Parse your driver specific paramters: [[parseArgs](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Benchmark.html#parseArgs-io.sbk.api.Parameters-)]
+      b). Parse your driver specific paramters: [[parseArgs](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Storage.html#parseArgs-io.sbk.api.Parameters-)]
         
-      c). Open the storage: [[openStorage](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Benchmark.html#openStorage-io.sbk.api.Parameters-)]
+      c). Open the storage: [[openStorage](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Storage.html#openStorage-io.sbk.api.Parameters-)]
         
-      d). Close the storage:[[closeStorage](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Benchmark.html#closeStorage-io.sbk.api.Parameters-)]
+      d). Close the storage:[[closeStorage](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Storage.html#closeStorage-io.sbk.api.Parameters-)]
         
-      e). Create a single writer instance:[[createWriter](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Benchmark.html#createWriter-int-io.sbk.api.Parameters-)]
+      e). Create a single writer instance:[[createWriter](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Storage.html#createWriter-int-io.sbk.api.Parameters-)]
         * Create Writer will be called multiple times by SBK incase of Multi writers are specified in the command line.   
         
-      f). Create a single Reader instance:[[createReader](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Benchmark.html#createReader-int-io.sbk.api.Parameters-)]
+      f). Create a single Reader instance:[[createReader](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Storage.html#createReader-int-io.sbk.api.Parameters-)]
         * Create Reader will be called multiple times by SBK incase of Multi readers are specified in the command line. 
         
-      g). Get the Data Type :[[getDataType](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Benchmark.html#getDataType--)]
+      g). Get the Data Type :[[getDataType](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Storage.html#getDataType--)]
         * In case if your data type is byte[] (Byte Array), No need to override this method. see the example:   [[Pulsar class](https://github.com/kmgowda/sbk/blob/master/driver-pulsar/src/main/java/io/sbk/Pulsar/Pulsar.java)]
         * If your Benchmark,  Reader and Writer classes operates on different data type such as String or custom data type, then you have to override this default implemenation.
 
@@ -356,15 +377,16 @@ tar -xvf ./build/distributions/sbk.tar -C ./build/distributions/.
 
 Example: For pulsar driver
 ```
-<SBK directory>/run/sbk/bin/sbk  -class Pulsar -help
+<SBK directory>./build/distributions/sbk/bin/sbk  -class pulsar -help
 usage: sbk -class Pulsar
  -ackQuorum <arg>       AckQuorum (default: 1)
  -admin <arg>           Admin URI, required to create the partitioned
                         topic
  -broker <arg>          Broker URI
- -class <arg>           Benchmark Driver Class,
-                        Available Drivers [ConcurrentQ, File, Kafka,
-                        Pravega, Pulsar]
+ -class <arg>           Storage Driver Class,
+                        Available Drivers [Artemis, AsyncFile, BookKeeper,
+                        ConcurrentQ, File, HDFS, Kafka, Nats, NatsStream,
+                        Nsq, Pravega, Pulsar, RabbitMQ, RocketMQ]
  -cluster <arg>         Cluster name (optional parameter)
  -context <arg>         Prometheus Metric context;default context:
                         8080/metrics; 'no' disables the  metrics
@@ -372,8 +394,7 @@ usage: sbk -class Pulsar
                         disabled
  -ensembleSize <arg>    EnsembleSize (default: 1)
  -flush <arg>           Each Writer calls flush after writing <arg> number
-                        of of events(records); Not applicable, if both
-                        writers and readers are specified
+                        of of events(records)
  -help                  Help message
  -partitions <arg>      Number of partitions of the topic (default: 1)
  -readers <arg>         Number of readers
@@ -388,7 +409,6 @@ usage: sbk -class Pulsar
                         if -1, get the maximum throughput
  -time <arg>            Number of seconds this SBK runs (24hrs by default)
  -topic <arg>           Topic name
- -version               Version
  -writeQuorum <arg>     WriteQuorum (default: 1)
  -writers <arg>         Number of writers
 ```
