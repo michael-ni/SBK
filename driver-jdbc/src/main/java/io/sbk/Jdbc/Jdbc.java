@@ -37,6 +37,8 @@ public class Jdbc implements Storage<String> {
     private final static String DERBY_NAME = "derby";
     private final static String POSTGRESQL_NAME = "postgresql";
     private final static String MSSQL_NAME = "sqlserver";
+    private final static String HIVE_NAME = "hive";
+
     private final static String CONFIGFILE = "jdbc.properties";
     private String tableName;
     private JdbcConfig config;
@@ -164,6 +166,10 @@ public class Jdbc implements Storage<String> {
                     query = "CREATE TABLE " + tableName +
                             "(ID BIGINT IDENTITY(1,1) PRIMARY KEY" +
                             ", DATA VARCHAR(" + params.getRecordSize() + ") NOT NULL)";
+                } else if (driverType.equalsIgnoreCase(HIVE_NAME)) {
+                    query = "CREATE TABLE " + tableName +
+                            "(`ID` BIGINT DEFAULT SURROGATE_KEY(), "+
+                            ", DATA VARCHAR(" + params.getRecordSize() + ") PRIMARY KEY (ID) DISABLE NOVALIDATE)";
                 } else {
                     query = "CREATE TABLE " + tableName +
                             "(ID BIGINT PRIMARY KEY AUTO_INCREMENT" +
