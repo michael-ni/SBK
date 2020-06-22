@@ -39,7 +39,7 @@ public class FoundationDBReader implements Reader<byte[]> {
     }
 
     @Override
-    public void recordRead(DataType dType, TimeStamp status, RecordTime recordTime, int id) throws IOException {
+    public void recordRead(DataType dType, TimeStamp status, RecordTime recordTime, int id) throws EOFException, IOException {
         status.startTime = System.currentTimeMillis();
         AsyncIterator<KeyValue> iterator = tx.getRange(Tuple.from(key).pack(),
                 Tuple.from(key + 1 + Integer.MAX_VALUE).pack()).
@@ -55,6 +55,7 @@ public class FoundationDBReader implements Reader<byte[]> {
                 recordTime.accept(id, status.startTime, status.endTime, entry.getValue().length, 1);
             }
         }
+        throw new EOFException();
     }
 
     @Override
