@@ -52,33 +52,10 @@ public class FoundationDBReader implements Reader<byte[]> {
                 KeyValue entry = iterator.next();
                 status.bytes += entry.getValue().length;
                 status.records += 1;
+                recordTime.accept(id, status.startTime, status.endTime, entry.getValue().length, 1);
             }
-            recordTime.accept(id, status.startTime, status.endTime, status.bytes, status.records);
         }
     }
-
-    @Override
-    public void recordReadTime(DataType dType, TimeStamp status, RecordTime recordTime, int id) throws IOException {
-        status.startTime = 0;
-        AsyncIterator<KeyValue> iterator = tx.getRange(Tuple.from(key).pack(),
-                Tuple.from(key + 1 + Integer.MAX_VALUE).pack()).
-                iterator();
-        status.endTime = System.currentTimeMillis();
-        status.records = 0;
-        if (iterator.hasNext()) {
-            status.bytes = 0;
-            while (iterator.hasNext()) {
-                KeyValue entry = iterator.next();
-                status.bytes += entry.getValue().length;
-                status.records += 1;
-                if (status.startTime == 0) {
-                    status.startTime = dType.getTime(entry.getValue());
-                }
-            }
-            recordTime.accept(id, status.startTime, status.endTime, status.bytes, status.records);
-        }
-    }
-
 
     @Override
     public byte[] read() throws EOFException, IOException {
