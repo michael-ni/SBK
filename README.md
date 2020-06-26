@@ -32,6 +32,7 @@ Currently SBK supports benchmarking of
 17. [Microsoft SQL](https://github.com/kmgowda/SBK/tree/master/driver-jdbc#jdbc-with-microsoft-sql-server)
 18. [SQLite](https://github.com/kmgowda/SBK/tree/master/driver-jdbc#jdbc-with-sqlite)
 19. [MinIO](https://min.io)
+20. [FoundationDB](https://www.foundationdb.org)
 
 In future, many more storage storage systems drivers will be plugged in. 
 
@@ -74,19 +75,20 @@ Running SBK locally:
 usage: sbk
  -class <arg>        Storage Driver Class,
                      Available Drivers [Artemis, AsyncFile, BookKeeper,
-                     ConcurrentQ, File, FileStream, HDFS, Jdbc, Kafka,
-                     MinIO, Nats, NatsStream, Nsq, Pravega, Pulsar,
-                     RabbitMQ, RocketMQ]
+                     ConcurrentQ, File, FileStream, FoundationDB, HDFS,
+                     Jdbc, Kafka, MinIO, Nats, NatsStream, Nsq, Pravega,
+                     Pulsar, RabbitMQ, RocketMQ]
  -context <arg>      Prometheus Metric context;default context:
                      8080/metrics; 'no' disables the  metrics
- -flush <arg>        Each Writer calls flush after writing <arg> number of
-                     of events(records)
  -help               Help message
  -readers <arg>      Number of readers
  -records <arg>      Number of records(events) if 'time' not specified;
                      otherwise, Maximum records per second by writer(s)
                      and/or Number of records per reader
  -size <arg>         Size of each message (event or record)
+ -sync <arg>         Each Writer calls flush/sync after writing <arg>
+                     number of of events(records) ; <arg> number of
+                     events(records) per Write or Read Transaction
  -throughput <arg>   if > 0 , throughput in MB/s
                      if 0 , writes 'records'
                      if -1, get the maximum throughput
@@ -338,7 +340,7 @@ For eclipse, you can generate eclipse project files by running `./gradlew eclips
         
       a). Writer Data [Async or Sync]: [[writeAsync](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Writer.html#writeAsync-byte:A-)]
         
-      b). Flush the data: [[flush](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Writer.html#flush--)]
+      b). Flush the data: [[sync](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Writer.html#sync--)]
         
       c). Close the Writer: [[close](https://kmgowda.github.io/SBK/javadoc/io/sbk/api/Writer.html#close--)]
         
@@ -393,17 +395,15 @@ usage: sbk -class Pulsar
  -broker <arg>          Broker URI
  -class <arg>           Storage Driver Class,
                         Available Drivers [Artemis, AsyncFile, BookKeeper,
-                        ConcurrentQ, File, FileStream, HDFS, Jdbc, Kafka,
-                        MinIO, Nats, NatsStream, Nsq, Pravega, Pulsar,
-                        RabbitMQ, RocketMQ]
+                        ConcurrentQ, File, FileStream, FoundationDB, HDFS,
+                        Jdbc, Kafka, MinIO, Nats, NatsStream, Nsq,
+                        Pravega, Pulsar, RabbitMQ, RocketMQ]
  -cluster <arg>         Cluster name (optional parameter)
  -context <arg>         Prometheus Metric context;default context:
                         8080/metrics; 'no' disables the  metrics
  -deduplication <arg>   Enable or Disable Deduplication; by default
                         disabled
  -ensembleSize <arg>    EnsembleSize (default: 1)
- -flush <arg>           Each Writer calls flush after writing <arg> number
-                        of of events(records)
  -help                  Help message
  -partitions <arg>      Number of partitions of the topic (default: 1)
  -readers <arg>         Number of readers
@@ -411,6 +411,9 @@ usage: sbk -class Pulsar
                         otherwise, Maximum records per second by writer(s)
                         and/or Number of records per reader
  -size <arg>            Size of each message (event or record)
+ -sync <arg>            Each Writer calls flush/sync after writing <arg>
+                        number of of events(records) ; <arg> number of
+                        events(records) per Write or Read Transaction
  -threads <arg>         io threads per Topic; by default (writers +
                         readers)
  -throughput <arg>      if > 0 , throughput in MB/s
