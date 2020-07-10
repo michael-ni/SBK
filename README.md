@@ -8,7 +8,7 @@ You may obtain a copy of the License at
     http://www.apache.org/licenses/LICENSE-2.0
 -->
 # Storage Benchmark Kit  ![SBK](https://github.com/kmgowda/SBK/blob/gh-pages/images/SBK-log-small-1.png)
-[![Build Status](https://travis-ci.org/kmgowda/SBK.svg?branch=master)](https://travis-ci.org/kmgowda/SBK) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)  [![Api](https://img.shields.io/badge/SBK-API-brightgreen)](https://kmgowda.github.io/SBK/javadoc/index.html) [![Version](https://img.shields.io/badge/release-0.77-blue)](https://github.com/kmgowda/SBK/releases/tag/0.77)
+[![Build Status](https://travis-ci.org/kmgowda/SBK.svg?branch=master)](https://travis-ci.org/kmgowda/SBK) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)  [![Api](https://img.shields.io/badge/SBK-API-brightgreen)](https://kmgowda.github.io/SBK/javadoc/index.html) [![Version](https://img.shields.io/badge/release-0.78-blue)](https://github.com/kmgowda/SBK/releases/tag/0.78)
 
 The SBK (Storage Benchmark Kit) is an open source software frame-work for the performance benchmarking of any storage system. If you are curious to measure the  maximum throughput performance of your storage device/system, then SBK is the right software for you. The SBK itself a very high-performance benchmark  tool/frame work. It massively writes the data to storage system and reads the data from strorage system. The SBK supports multi writers and readers and also the End to End latency benchmarking. The percentiles are calculated for complete data written/read without any sampling; hence the percentiles are 100% accurate.
 
@@ -33,6 +33,10 @@ Currently SBK supports benchmarking of
 18. [SQLite](https://github.com/kmgowda/SBK/tree/master/driver-jdbc#jdbc-with-sqlite)
 19. [MinIO](https://min.io)
 20. [FoundationDB](https://www.foundationdb.org)
+21. [FoundationDB Record Layer](https://foundationdb.github.io/fdb-record-layer)
+22. [FoundationDB Document Layer](https://github.com/kmgowda/SBK/tree/master/driver-mongodb#foundationdb-document-layer-performance-benchmarking)
+23. [MongoDB](https://www.mongodb.com)
+24. [CockroachDB](https://github.com/kmgowda/SBK/tree/master/driver-jdbc#jdbc-postgresql-for-cockroachdb-performance-benchmarking)
 
 In future, many more storage storage systems drivers will be plugged in. 
 
@@ -72,12 +76,14 @@ Running SBK locally:
 
 ```
 <SBK directory>/./build/distributions/sbk/bin/sbk -help
+...
 usage: sbk
  -class <arg>        Storage Driver Class,
                      Available Drivers [Artemis, AsyncFile, BookKeeper,
-                     ConcurrentQ, File, FileStream, FoundationDB, HDFS,
-                     Jdbc, Kafka, MinIO, Nats, NatsStream, Nsq, Pravega,
-                     Pulsar, RabbitMQ, RocketMQ]
+                     ConcurrentQ, FdbRecord, File, FileStream,
+                     FoundationDB, HDFS, Jdbc, Kafka, MinIO, MongoDB,
+                     Nats, NatsStream, Nsq, Pravega, Pulsar, RabbitMQ,
+                     RocketMQ]
  -context <arg>      Prometheus Metric context;default context:
                      8080/metrics; 'no' disables the  metrics
  -help               Help message
@@ -388,6 +394,8 @@ tar -xvf ./build/distributions/sbk.tar -C ./build/distributions/.
 Example: For pulsar driver
 ```
 <SBK directory>./build/distributions/sbk/bin/sbk  -class pulsar -help
+
+...
 usage: sbk -class Pulsar
  -ackQuorum <arg>       AckQuorum (default: 1)
  -admin <arg>           Admin URI, required to create the partitioned
@@ -395,9 +403,10 @@ usage: sbk -class Pulsar
  -broker <arg>          Broker URI
  -class <arg>           Storage Driver Class,
                         Available Drivers [Artemis, AsyncFile, BookKeeper,
-                        ConcurrentQ, File, FileStream, FoundationDB, HDFS,
-                        Jdbc, Kafka, MinIO, Nats, NatsStream, Nsq,
-                        Pravega, Pulsar, RabbitMQ, RocketMQ]
+                        ConcurrentQ, FdbRecord, File, FileStream,
+                        FoundationDB, HDFS, Jdbc, Kafka, MinIO, MongoDB,
+                        Nats, NatsStream, Nsq, Pravega, Pulsar, RabbitMQ,
+                        RocketMQ]
  -cluster <arg>         Cluster name (optional parameter)
  -context <arg>         Prometheus Metric context;default context:
                         8080/metrics; 'no' disables the  metrics
@@ -423,4 +432,5 @@ usage: sbk -class Pulsar
  -topic <arg>           Topic name
  -writeQuorum <arg>     WriteQuorum (default: 1)
  -writers <arg>         Number of writers
+
 ```
